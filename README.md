@@ -23,7 +23,7 @@ to use json online editor or chrome browser extension for this purpose.<p>
 The structure of the configuration file is as follow:<p>
 <pre>
 {
-"<i>1st_symlink_name</i>:
+"<i>1st_symlink_name</i>":
      {
       "default":"<i>default_target_name</i>",
       "log":"<i>path_to_logfile</i>",                         &lt;---- OPTIONAL PARAMETER!
@@ -31,7 +31,7 @@ The structure of the configuration file is as follow:<p>
       "<i>2nd_target_name</i>":{  <i>ACL</i>   },
                                 ....
       },                          
-"<i>2nd_symlink_name</i>:
+"<i>2nd_symlink_name</i>":
      {
       "default":"<i>default_target_name</i>",
       "log":"<i>path_to_logfile</i>",                         &lt;---- OPTIONAL PARAMETER!

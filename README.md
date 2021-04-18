@@ -12,7 +12,7 @@ customize system (e.g. GTK) on per application basis.
 
 <h4>Compiling:</h4>
 1. Download sources to a directory.<br>
-2. Execute “make” in it. Use “make CFLAGS=DLFS_PRINT_CONFIG” to enable code that prints
+2. Execute “make” in it. Use “make CFLAGS=-DDLFS_PRINT_CONFIG” to enable code that prints
 current configuration on load.<br>
 3. Copy the binary “dlfs” to a convenient destination.
 

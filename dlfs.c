@@ -26,6 +26,7 @@ static dlfsSymlink *DynLinks;
 
 static void free_acl(dlfsACL*);
 static int applyACL(dlfsACL*, const char*, struct fuse_context*);
+static int pid2comm(uid_t pid, char *buf);
 
 static void *dlfs_init(struct fuse_conn_info *conn,
 			struct fuse_config *cfg)
@@ -160,7 +161,7 @@ static int dlfs_readlink(const char *path, char *buf, size_t size)
     size_t len, offt = 0;
     dlfsSymlink *link;
     dlfsTarget *t;
-    char *target, *home;
+    char *target, *home, comm[PATH_MAX];
     FILE *log;
     struct fuse_context *ctx = fuse_get_context();
 
@@ -179,13 +180,14 @@ static int dlfs_readlink(const char *path, char *buf, size_t size)
 
     if(link->log) {
         log = fopen(link->log, "a");
-        if(log) fprintf(log, "%s resolved as %s%s by PID/UID/GID=%u/%u/%u\n",
+        pid2comm(ctx->pid, comm);
+        if(log) fprintf(log, "%s accessed by %s (UID/GID=%u/%u) resolved as %s%s\n",
                         path,
-                        target ? "" : "default target ",
-                        target ? target : link->def_target,
-                        ctx->pid,
+                        comm,
                         ctx->uid,
-                        ctx->gid);
+                        ctx->gid,
+                        target ? "" : "default target ",
+                        target ? target : link->def_target);
         if(log) fclose(log);
     }
 
@@ -218,7 +220,7 @@ static const struct fuse_operations dlfs_oper = {
 
 static int applyACL(dlfsACL *acl, const char *path, struct fuse_context *ctx)
 {
-    int i, fd, status, ret = 0;
+    int i, status, ret = 0;
     pid_t p;
     dlfsACL *a;
     char buf[PATH_MAX], mypidstr[8], myuidstr[12], mygidstr[12];
@@ -228,13 +230,7 @@ static int applyACL(dlfsACL *acl, const char *path, struct fuse_context *ctx)
     switch(acl->type) {
         case COMM:
             if(acl->pattern == NULL) return 0;
-            sprintf(buf, "/proc/%u/comm", ctx->pid);
-            fd = open(buf, 0);
-            if(fd < 0) return 0;
-            i = read(fd, buf, PATH_MAX);
-            close(fd);
-            if(i <= 1) return 0;
-            buf[i - 1] = '\0';
+            if(pid2comm(ctx->pid, buf) < 0) return 0;
             for(i = 0; i < acl->plen; i++) if(strcmp(((char **)acl->pattern)[i], buf) == 0) return 1;
             break;
 
@@ -306,6 +302,21 @@ static void show_help(const char *progname)
            "\t                     \t (default: %s)\n"
            "\t-h | --help          \t Show this screen\n"
            "\n", DEFAULT_CONFIG_FNAME);
+}
+
+static int pid2comm(uid_t pid, char *buf)
+{
+    int len, fd;
+
+    sprintf(buf, "/proc/%u/comm", pid);
+    fd = open(buf, 0);
+    if(fd < 0) return -1;
+    len = read(fd, buf, PATH_MAX);
+    close(fd);
+    if(len <= 1) return -1;
+    buf[len - 1] = '\0';
+
+    return 0;
 }
 
 int main(int argc, char *argv[])

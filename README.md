@@ -78,7 +78,7 @@ GTK config file to the dynamic symlink). In the following example applications p
 will use dark GTK theme regardless of the GTK version. All GTK2 accesses will be logged.
 
 <h3>III. Usage</h3>
-Shows help:
+To see help:
 <pre>dlfs -h|--help</pre> 
 Usage:
 <pre>dlfs [<i>FUSE_options</i>] [-c | --config=<i>config_file</i>] <mount_point></pre> 

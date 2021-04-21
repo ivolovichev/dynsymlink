@@ -81,5 +81,5 @@ will use dark GTK theme regardless of the GTK version. All GTK2 accesses will be
 Shows help:
 <pre>dlfs -h|--help</pre> 
 Usage:
-<pre>dlfs [<i>FUSE_options</i>] [-c | --config==<i>config_file</i>] <mount_point></pre> 
+<pre>dlfs [<i>FUSE_options</i>] [-c | --config=<i>config_file</i>] <mount_point></pre> 
 Default location of the configuration file is ~/.config/dynlink/config.

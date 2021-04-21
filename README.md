@@ -18,7 +18,10 @@ current configuration on load.<br>
 
 <h3>II. Configure</h3>
 Create configuration file. It is in JSON format (RFC 8259). It is convenient
-to use json online editor or chrome browser extension for this purpose.<p>
+to use json online editor or chrome browser extension for this purpose. 
+For human reader convenience, comments are partly implemented: 
+line beginning with # (exactly in the first position!) is treated 
+as a comment and is neglected by the standard JSON parser.<p>
 
 The structure of the configuration file is as follow:<p>
 <pre>
@@ -34,9 +37,9 @@ The structure of the configuration file is as follow:<p>
 "<i>2nd_symlink_name</i>":
      {
       "default":"<i>default_target_name</i>",
-      "log":"<i>path_to_logfile</i>",                         &lt;---- OPTIONAL PARAMETER!
+      "log":"<i>path_to_logfile</i>",                         &lt;---- <i>OPTIONAL PARAMETER!</i>
       "<i>1st_target_name</i>":{  <i>ACL</i>   },
-      "<i>2nd_target_name</i>":{  <i>ACL</i>   },
+#      "<i>2nd_target_name</i>":{  <i>ACL</i>   },            &lt;---- <i>LINE COMMENTED OUT!</i>
                                 ...
       },                          
                                 ...
@@ -45,8 +48,9 @@ The structure of the configuration file is as follow:<p>
 <p>Here  <i>default_target_name</i> is a path the symlink points to if no condition is met.
 If not specified, /dev/null is used.
 Optional parameter "log" specifies location of the logfile where all access to the symlink 
-will be logged to. ACL is the JSON object representing a condition. 
-The dynamic symlink points to the first target with fulfilled condition. <p>
+will be logged to. Tilde symbol (~) is not permitted here! <br>
+ACL is the JSON object representing a condition. The dynamic symlink points to the first target 
+with fulfilled condition. <p>
 
 The following ACL are implemented.
 <pre>"COMM":[  <i>array of command names</i>  ]</pre>

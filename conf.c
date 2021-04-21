@@ -14,14 +14,16 @@ int readConfig(const char *cfile, dlfsSymlink **pcSymLink)
     dlfsSymlink *cSymLink;
     dlfsTarget *cTrgt, **pcTrgt;
     int n;
-    size_t len;
+    size_t len, flen, offt;
+    FILE *cfgfile;
 #ifdef DLFS_PRINT_CONFIG
     dlfsSymlink **DynLinks = pcSymLink;
 #endif
     const char *str;
-    char buf[PATH_MAX], *home;
+    char buf[PATH_MAX], *home, *json, *csptr;
 
-    if(cfile[0] == '~') {
+    if(cfile[0] == '~')
+    {
         home = getpwuid(getuid())->pw_dir;
         len = strlen(home);
         strcpy(buf, home);
@@ -29,7 +31,33 @@ int readConfig(const char *cfile, dlfsSymlink **pcSymLink)
         cfile = buf;
     }
 
-    json_object *root = json_object_from_file(cfile);
+    cfgfile = fopen(cfile, "r");
+    if(!cfgfile)
+    {
+        perror("Can't open configuration file");
+        return -1;
+    }
+    fseek(cfgfile, 0L, SEEK_END);
+    flen = ftell(cfgfile);
+    rewind(cfgfile);
+    json = (char *)malloc(flen);
+    if(!json)
+    {
+        fprintf(stderr, "Can't allocate memory\n");
+        return -1;
+    }
+
+    csptr = json;
+    offt = 0;
+    while(fgets(csptr, flen - offt, cfgfile))
+    {
+        if(csptr[0] == '#') continue;
+        len = strlen(csptr);
+        offt += len;
+        csptr += len;
+    }
+
+    json_object *root =  json_tokener_parse(json);
     if(!root) {
         perror("Can't parse configuration file");
         return -1;

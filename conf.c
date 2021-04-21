@@ -63,6 +63,8 @@ int readConfig(const char *cfile, dlfsSymlink **pcSymLink)
         return -1;
     }
 
+    free(json);
+    
     json_object_object_foreach(root, skey, sval) {
         if(json_object_get_type(sval) != json_type_object) {
             fprintf(stderr, "Invalid json type in symlink definition\n");
